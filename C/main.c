@@ -4,23 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
-void  str2byte(char* bytearray)
+void  str2byte(char* bytearray,char* hexstring)
 {
-const char* hexstring = "1DE7142993816A6A81A7D4A2089A11F5C0A150FBC8E7DC0978D58825CE550000";
-size_t length = strlen(hexstring);
-//unsigned char bytearray[length / 2];
-
-for (size_t i = 0, j = 0; i < (length / 2); i++, j += 2)
-{
-  bytearray[i] = (hexstring[j] % 32 + 9) % 25 * 16 + (hexstring[j+1] % 32 + 9) % 25;
-}
-
- 
-printf("\nsize: %d\n", length );
-//dump_hex_buff(bytearray, length/2); 
- 
+  size_t length = strlen(hexstring);
+  for (size_t i = 0, j = 0; i < (length / 2); i++, j += 2)
+  {
+    bytearray[i] = (hexstring[j] % 32 + 9) % 25 * 16 + (hexstring[j+1] % 32 + 9) % 25;
+  }
 
 }
 
@@ -48,28 +38,30 @@ int main(void)
       exit(1);
     }
     
-    char *password = "1234";
-    char *msg = "hello_sodium";
-    char *add_data = "crypttext";
-    const int add_data_len = 6;
+    char *password = "123";
+    char *password_len = strlen(password);
+    char *msg = "Hello";
     const int msg_len = strlen(msg);
 
+    
+    //const char* hexstring = "1DE7142993816A6A81A7D4A2089A11F5C0A150FBC8E7DC0978D58825CE550000";
  
 
   unsigned char key[crypto_aead_aes256gcm_KEYBYTES];
   unsigned char ciphertext[msg_len + crypto_aead_aes256gcm_ABYTES];
-  char encrypted[34];  
   unsigned long long ciphertext_len;
+  unsigned char nonce[crypto_aead_aes256gcm_NPUBBYTES];
 
+  
+  
   sodium_init();
   if (crypto_aead_aes256gcm_is_available() == 0) {
       abort(); /* Not available on this CPU */ 
   }
 
+  randombytes_buf(nonce, sizeof nonce);
+  
 /***********************************************************/
-
-#define KEY_LEN crypto_box_SEEDBYTES
- 
 if (crypto_pwhash
     (key, sizeof key, password, strlen(password), key,
      crypto_pwhash_OPSLIMIT_INTERACTIVE, crypto_pwhash_MEMLIMIT_INTERACTIVE,
@@ -77,51 +69,44 @@ if (crypto_pwhash
     /* out of memory */
 }
 
-
- 
+/***********************************************************/
+/* Encrypt */
 crypto_aead_aes256gcm_encrypt(ciphertext, &ciphertext_len,
                               msg, msg_len,
-                              add_data, add_data_len,
-                              NULL, key, key);
+                              password, password_len,
+                              NULL, nonce, key);
 
-
-
-
-str2byte(&encrypted);
-	
- 
+/***********************************************************/ 
+/* Dencrypt */ 
 unsigned char decrypted[msg_len];
 unsigned long long decrypted_len;
  if (ciphertext_len < crypto_aead_aes256gcm_ABYTES ||
     crypto_aead_aes256gcm_decrypt(decrypted, &decrypted_len,
                                   NULL,
-                                  encrypted, ciphertext_len,
-                                  add_data,
-                                  add_data_len,
-                                  key, key) != 0) {
-    /* message forged! */
+                                  ciphertext,ciphertext_len,
+                                  password,
+                                  password_len,
+                                  nonce, key) != 0) {
 }
 
+/***********************************************************/
 
- 
-    printf("...sodium library successfully found\n");
-    puts("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    puts("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         printf("key:");
-        dump_hex_buff(key, crypto_secretbox_KEYBYTES);
+        dump_hex_buff(key, sizeof key);
+
+        printf("nonce:");
+        dump_hex_buff(nonce, sizeof nonce);	
 
         printf("encrypted:");
-        dump_hex_buff(ciphertext, crypto_secretbox_KEYBYTES);
+        dump_hex_buff(ciphertext, ciphertext_len);
 	
-        printf("decrypted data (hex):");
-        dump_hex_buff(decrypted, msg_len);
+        /* printf("decrypted data (hex):");
+	   dump_hex_buff(decrypted, msg_len); */
+	
         printf("decrpyted data (ascii):%s\n", decrypted);
-        puts("...string to bytes:");
-
-        dump_hex_buff(encrypted, crypto_secretbox_KEYBYTES);	
-        printf("\n%d\n",ciphertext_len );
 	
-	
-    puts("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");        
+    puts("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");        
      
     return 0;
 }
