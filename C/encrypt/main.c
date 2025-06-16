@@ -71,7 +71,7 @@ if (crypto_pwhash
 /* Encrypt */
 crypto_aead_aes256gcm_encrypt(ciphertext, &ciphertext_len,
                               msg, msg_len,
-                              password, password_len,
+                              password, password_len-1,
                               NULL, nonce, key);
 
 /***********************************************************/ 
@@ -83,10 +83,15 @@ unsigned long long decrypted_len;
                                   NULL,
                                   ciphertext,ciphertext_len,
                                   password,
-                                  password_len,
+                                  password_len-1,
                                   nonce, key) != 0) {
 }
 
+
+
+ 
+ 
+ 
 /***********************************************************/
 
     puts("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
@@ -98,11 +103,13 @@ unsigned long long decrypted_len;
 
         printf("encrypted:");
         dump_hex_buff(ciphertext, ciphertext_len);
+        printf("encrypted len: %d\n", ciphertext_len );
 	
-        /* printf("decrypted data (hex):");
-	   dump_hex_buff(decrypted, msg_len); */
+         printf("decrypted data (hex):");
+	   dump_hex_buff(decrypted, msg_len); 
 	
         printf("decrpyted data (ascii):%s\n", decrypted);
+        printf("ciphertext_len:%d\n", ciphertext_len);	
 
 
         size_t nonce_maxlen = crypto_sign_PUBLICKEYBYTES * 2 + 1;
