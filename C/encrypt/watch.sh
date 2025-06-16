@@ -4,7 +4,7 @@
 while true; do
       inotifywait -e modify "main.c"
       make linux
-      ./hello_sodium_linux
+      ./main_linux
       sleep 2
       cp output.txt ../decrypt/
 done
