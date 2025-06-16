@@ -4,32 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void  str2byte(char* bytearray,char* hexstring)
-{
-  size_t length = strlen(hexstring);
-  for (size_t i = 0, j = 0; i < (length / 2); i++, j += 2)
-  {
-    bytearray[i] = (hexstring[j] % 32 + 9) % 25 * 16 + (hexstring[j+1] % 32 + 9) % 25;
-  }
-
-}
-
-
-void dump_hex_buff(unsigned char buf[], unsigned int len)
-{
-    printf("\n");  
-    int i;
-    for (i=0; i<len; i++) {
-      printf("%02X ", buf[i]);
-    }
-    printf("\n");
-}
-
-
-/*
-  https://doc.libsodium.org/secret-key_cryptography/aead/aes-256-gcm#example-combined-mode
-  https://franks42.gitbooks.io/libsodium-doc/content/secret-key_cryptography/aead.html
- */
+void dump_hex_buff(unsigned char buf[], unsigned int len);
 
 int main(void)
 {
@@ -39,20 +14,16 @@ int main(void)
     }
     
     char *password = "123";
-    char *password_len = strlen(password);
+    unsigned long long  password_len = strlen(password);
     char *msg = "Hello";
     const int msg_len = strlen(msg);
 
-    
 
   unsigned char key[crypto_aead_aes256gcm_KEYBYTES];
   unsigned char ciphertext[msg_len + crypto_aead_aes256gcm_ABYTES];
   unsigned long long ciphertext_len;
   unsigned char nonce[crypto_aead_aes256gcm_NPUBBYTES];
 
-  
-  
-  sodium_init();
   if (crypto_aead_aes256gcm_is_available() == 0) {
       abort(); /* Not available on this CPU */ 
   }
@@ -94,7 +65,7 @@ unsigned long long decrypted_len;
  
 /***********************************************************/
 
-    puts("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    puts("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         printf("key:");
         dump_hex_buff(key, sizeof key);
 
@@ -154,8 +125,18 @@ unsigned long long decrypted_len;
     }
 
 	
-    puts("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");        
+    puts("bbbbbbbbbbbbbbbbbbbbb");        
      
     return 0;
 }
 
+
+void dump_hex_buff(unsigned char buf[], unsigned int len)
+{
+    printf("\n");  
+    int i;
+    for (i=0; i<len; i++) {
+      printf("%02X ", buf[i]);
+    }
+    printf("\n");
+}
