@@ -44,8 +44,6 @@ int main(void)
     const int msg_len = strlen(msg);
 
     
-    //const char* hexstring = "1DE7142993816A6A81A7D4A2089A11F5C0A150FBC8E7DC0978D58825CE550000";
- 
 
   unsigned char key[crypto_aead_aes256gcm_KEYBYTES];
   unsigned char ciphertext[msg_len + crypto_aead_aes256gcm_ABYTES];
@@ -105,6 +103,49 @@ unsigned long long decrypted_len;
 	   dump_hex_buff(decrypted, msg_len); */
 	
         printf("decrpyted data (ascii):%s\n", decrypted);
+
+
+        size_t nonce_maxlen = crypto_sign_PUBLICKEYBYTES * 2 + 1;
+        size_t key_maxlen = crypto_sign_SECRETKEYBYTES * 2 + 1;
+        size_t ct_maxlen = crypto_sign_BYTES * 2 + 1;
+
+        unsigned char key_hex[sizeof key];
+        unsigned char nonce_hex[sizeof nonce];
+        unsigned char ct_hex[ciphertext_len];
+
+        sodium_bin2hex(nonce_hex, nonce_maxlen, nonce, sizeof nonce); 	
+        sodium_bin2hex(ct_hex, ct_maxlen, ciphertext, ciphertext_len);
+        printf("ct_hex: %s/%s \n", ct_hex, nonce_hex); 	
+	
+        /* sodium_bin2hex(key_hex, key_maxlen, key, crypto_sign_PUBLICKEYBYTES);  */
+        /* printf("key_hex: %s\n", key_hex); */
+
+        /*  printf("nonce_hex: %s\n", nonce_hex); */
+        //printf("max len: %d\n", crypto_sign_PUBLICKEYBYTES * 2 + 1);		
+
+
+
+
+    int e = EXIT_SUCCESS;
+    char *path = "output.txt";
+
+    
+    FILE *file = fopen(path, "w");
+    if (!file) 
+    {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+
+    fprintf(file,"%s/%s \n", ct_hex, nonce_hex); 	     
+
+    
+    if (fclose(file)) 
+    {
+        perror(path);
+        return EXIT_FAILURE;
+    }
+
 	
     puts("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");        
      
