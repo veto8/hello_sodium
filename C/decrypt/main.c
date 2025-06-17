@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 void dump_hex_buff(unsigned char buf[], unsigned int len);
-  
+
+
 int main(void)
 {
     char *password = "123";
@@ -37,7 +37,6 @@ int main(void)
 
 
   
-
 // Find the delimiter
     char *delim_pos = strstr(line_buf, delimiter);
     if (delim_pos) {
@@ -59,8 +58,8 @@ int main(void)
 
 
     unsigned char bin[strlen(ct)/2];
-    unsigned long long  bin_len = 0;
-    size_t bin_end = 0;
+    size_t bin_len = 0;
+    const char *bin_end = 0;
 
     if (sodium_hex2bin(bin, sizeof(bin),
                        ct, strlen(ct),
@@ -77,7 +76,7 @@ int main(void)
 
     unsigned char bin2[strlen(nonce)/2];
     size_t bin2_len = 0;
-    size_t nonce_end = 0;
+    const char  *nonce_end = NULL;
 
     if (sodium_hex2bin(bin2, sizeof(bin2),
                        nonce, strlen(nonce),
