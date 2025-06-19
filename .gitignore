@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+C/encrypt/outoutp.txt
 
 # Object files
 *.o
